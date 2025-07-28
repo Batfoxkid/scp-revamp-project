@@ -4,6 +4,7 @@
 static DynamicDetour StartLagCompensation;
 static DynamicHook ForceRespawn;
 static Address CLagCompensationManager;
+static DynamicDetour g_CalcPlayerScore;
 
 static int ForceRespawnPreHook[MAXPLAYERS+1];
 static int ForceRespawnPostHook[MAXPLAYERS+1];
@@ -19,7 +20,7 @@ void DHook_PluginStart()
 	CreateDetour(gamedata, "CEconEntity::UpdateModelToClass", DHook_UpdateModelToClassPre);
 	CreateDetour(gamedata, "CTFPlayer::DropAmmoPack", DHook_DropAmmoPackPre);
 	CreateDetour(gamedata, "CTFPlayer::GetMaxAmmo", DHook_GetMaxAmmoPre);
-
+	CreateDetour(gamedata, "CTFGameRules::CalcPlayerScore", Detour_CalcPlayerScore);
 	ForceRespawn = CreateHook(gamedata, "CBasePlayer::ForceRespawn");
 	
 	delete gamedata;
@@ -119,6 +120,26 @@ static MRESReturn CanPickupDroppedWeapon(int client, DHookReturn ret)
 	return MRES_Supercede;
 }
 */
+
+MRESReturn Detour_CalcPlayerScore(DHookReturn hReturn, DHookParam hParams)
+{
+	/*
+	int client = hParams.Get(2);
+
+#if !defined RTS
+	int iScore = PlayerPoints[client];
+#endif
+
+#if defined RPG
+	int iScore = Level[client];
+#endif
+	
+	hReturn.Value = iScore;
+	*/
+	//make strange point gain not possible
+	hReturn.Value = 0;
+	return MRES_Supercede;
+}
 static MRESReturn DHook_DropAmmoPackPre(int client, DHookParam param)
 {
 	return MRES_Supercede;
